@@ -22,8 +22,13 @@ def data_collection():
 def data_overview():
 
     st.write('')
-    st.header('PhonePe Pulse Data 2018-2022: Insights for India.')
+    st.header('PhonePe Pulse Data: Insights for India')
     st.write('')
+
+    st.subheader('Key Dimensions:')
+    st.write('- State - All States in India')
+    st.write('- Year -  2018 to 2022')
+    st.write('- Quarter - Q1 (Jan to Mar), Q2 (Apr to June), Q3 (July to Sep), Q4 (Oct to Dec)')
 
     st.subheader('Aggregated Transaction:')
     st.write('Transaction data broken down by type of payments at state level.')
@@ -73,13 +78,13 @@ def data_overview():
     st.write('Explore the most number of the transactions happened for a selected Year-Quarter combination')
     st.write('- Top 10 States')
     st.write('- Top 10 Districts')
-    st.write('- Top 10 Pin Codes')
+    st.write('- Top 10 Pincodes')
 
     st.subheader('Top User:')
     st.write('Explore the most number of registered users for a selected Year-Quarter combination')
     st.write('- Top 10 States')
     st.write('- Top 10 Districts')
-    st.write('- Top 10 Pin Codes')
+    st.write('- Top 10 Pincodes')
 
 
 def state_list():
@@ -6458,9 +6463,9 @@ def data_analysis():
 
 st.subheader('Please select the option below:')
 st.code('1 - Data Collection')
-st.code('2 - Data Insights')
+st.code('2 - Data Overview')
 st.code('3 - Migrating Data to SQL Database')
-st.code('4 - Data Analysis')
+st.code('4 - Data Insights and Exploration')
 st.code('5 - Exit')
 
 list_options = ['Select one', 'Data Collection', 'Data Overview',
