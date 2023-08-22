@@ -61,7 +61,7 @@ To use this project, follow these steps:
 
 - **Live Geo Visualization Dashboard:** Create a live geo visualization dashboard using Streamlit and Plotly for interactive data exploration, allowing you to dynamically interact with the data on maps.
 
-- **Top Performers Highlight:** Easily spot top 10 states, districts, and pin codes through user-friendly visualizations.
+- **Top Performers Highlight:** Easily spot top 10 states, districts, and pincodes through user-friendly visualizations.
 
 - **User-Focused Dashboard:** Navigate through an intuitive Streamlit dashboard designed for user convenience, making exploration a breeze.
 
