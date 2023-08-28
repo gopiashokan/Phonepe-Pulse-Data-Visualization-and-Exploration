@@ -27,7 +27,7 @@ def data_overview():
 
     st.subheader('Key Dimensions:')
     st.write('- State - All States in India')
-    st.write('- Year -  2018 to 2022')
+    st.write('- Year -  2018 to 2023')
     st.write('- Quarter - Q1 (Jan to Mar), Q2 (Apr to June), Q3 (July to Sep), Q4 (Oct to Dec)')
 
     st.subheader('Aggregated Transaction:')
@@ -98,6 +98,17 @@ def state_list():
     return state
 
 
+def year_list():
+    gopi = psycopg2.connect(
+        host='localhost', user='postgres', password='root', database='phonepe')
+    cursor = gopi.cursor()
+    cursor.execute(f"""select distinct year from aggregated_transaction
+                        order by year asc;""")
+    s = cursor.fetchall()
+    year = [i[0] for i in s]
+    return year
+
+
 def brand_list():
     gopi = psycopg2.connect(
         host='localhost', user='postgres', password='root', database='phonepe')
@@ -129,7 +140,7 @@ class data_extraction:
 
             for i in agg_state_list:
                 path_i = path + i + '/'                 # india/state/delhi/
-                agg_year_list = os.listdir(path_i)      # 2018,2019,2020,2021,2022
+                agg_year_list = os.listdir(path_i)      # 2018,2019,2020,2021,2022,2023
 
                 for j in agg_year_list:
                     path_j = path_i + j + '/'           # india/state/delhi/2018/
@@ -810,7 +821,7 @@ class plotly:
 
         new_text_xaxis = [pincode.replace('@@@','<br>') for pincode in df[x]]
 
-        fig.update_xaxes(tickmode='array', tickvals=list(range(len(df))), ticktext=new_text_xaxis, tickfont=dict(size=13.25))
+        fig.update_xaxes(tickmode='array', tickvals=list(range(len(df))), ticktext=new_text_xaxis, tickfont=dict(size=12))
 
         text_position = ['inside' if val >= max(df[y]) * 0.90 else 'outside' for val in df[y]]
 
@@ -4849,7 +4860,7 @@ class top_transaction_and_user:
 
 def data_analysis():
     analysis = st.selectbox('', ['Select one', 'State', 'Year', 'Quater',
-                            'District', 'Transaction Type', 'User Brand', 'Top 10 Insights'])
+                            'District', 'Transaction Type', 'User Brand', 'Top 10'])
     st.write('')
 
     if analysis:
@@ -4877,8 +4888,9 @@ def data_analysis():
                 if advanced_filters:
                     col1, col2, col3, col4 = st.columns(4)
                     with col1:
-                        year_option = st.selectbox(
-                            'Year: ', ['Select One', '2022', '2021', '2020', '2019', '2018'])
+                        list_year = ['Select One']
+                        list_year.extend(year_list())
+                        year_option = st.selectbox('Year:             ', list_year)
                     with col2:
                         quater_option = st.selectbox(
                             'Quater: ', ['Select One', 'Q1', 'Q2', 'Q3', 'Q4'])
@@ -4968,11 +4980,11 @@ def data_analysis():
                                                                                                                         state_option, year_option, quater_option)
                         with col1:
                             plotly.line_chart(df=selectstate_selectyear_selectquater_type_wise_total_transaction_count,y='Transaction Type',x='Transaction Count', 
-                                                        text='Transaction', textposition=['bottom left','bottom center','top center','top right','top right'], 
+                                                        text='Transaction', textposition=['bottom left','top right','top right','top right','top right'], 
                                                         color='#5D9A96', title='Type wise Transaction Count')
                         with col2:
                             plotly.line_chart(df=selectstate_selectyear_selectquater_type_wise_total_transaction_amount,y='Transaction Type',x='Transaction Amount', 
-                                                        text='Transaction', textposition=['top center','top center','top right','top right','top right'], 
+                                                        text='Transaction', textposition=['top center','top right','top right','top right','top right'], 
                                                         color='#5cb85c', title='Type wise Transaction Amount')
 
                 else:
@@ -5022,16 +5034,21 @@ def data_analysis():
                     selectstate_quater_type_wise_total_transaction_amount = aggregated_transaction.selectstate_quater_type_wise_total_transaction_amount(state_option)
                     with col1:
                         plotly.multi_line_chart(df=selectstate_year_quater_wise_total_transaction_count, x='Quater', y='Transaction Count',
-                                                colorcolumn='Year', title='Year - Quater wise Transaction Count')
-                        plotly.multi_line_chart(df=selectstate_year_type_wise_total_transaction_count, y='Transaction Count', x='Year',
-                                                colorcolumn='Transaction Type', title='Year - Type wise Transaction Count')
-                        plotly.multi_line_chart(df=selectstate_quater_type_wise_total_transaction_count, x='Quater', y='Transaction Count',
-                                                colorcolumn='Transaction Type', title='Quater - Type wise Transaction Count')
+                                                colorcolumn='Year', title='Year - Quater wise Transaction Count')                                            
                     with col2:
                         plotly.multi_line_chart(df=selectstate_year_quater_wise_total_transaction_amount, x='Quater', y='Transaction Amount',
-                                                colorcolumn='Year', title='Year - Quater wise Transaction Amount')
-                        plotly.multi_line_chart(df=selectstate_year_type_wise_total_transaction_amount, y='Transaction Amount', x='Year',
+                                                colorcolumn='Year', title='Year - Quater wise Transaction Amount')                                     
+                    
+                    plotly.multi_line_chart(df=selectstate_year_type_wise_total_transaction_count, y='Transaction Count', x='Year',
+                                                colorcolumn='Transaction Type', title='Year - Type wise Transaction Count')
+                    plotly.multi_line_chart(df=selectstate_year_type_wise_total_transaction_amount, y='Transaction Amount', x='Year',
                                                 colorcolumn='Transaction Type', title='Year - Type wise Transaction Amount')
+                    
+                    col1, col2 = st.columns(2)
+                    with col1:                   
+                        plotly.multi_line_chart(df=selectstate_quater_type_wise_total_transaction_count, x='Quater', y='Transaction Count',
+                                                colorcolumn='Transaction Type', title='Quater - Type wise Transaction Count')
+                    with col2:               
                         plotly.multi_line_chart(df=selectstate_quater_type_wise_total_transaction_amount, x='Quater', y='Transaction Amount',
                                                 colorcolumn='Transaction Type', title='Quater - Type wise Transaction Amount')                 
 
@@ -5063,8 +5080,9 @@ def data_analysis():
                 if advanced_filters:
                     col1, col2, col3, col4 = st.columns(4)
                     with col1:
-                        year_option = st.selectbox(
-                            'Year:  ', ['Select One', '2022', '2021', '2020', '2019', '2018'])
+                        list_year = ['Select One']
+                        list_year.extend(year_list())
+                        year_option = st.selectbox('Year:  ', list_year)
                     with col2:
                         quater_option = st.selectbox(
                             'Quater:  ', ['Select One', 'Q1', 'Q2', 'Q3', 'Q4'])
@@ -5173,27 +5191,29 @@ def data_analysis():
                                             colorcolumn='Year', text='User', textposition='top center',
                                             title='Year - Quater wise User Count', title_x=0.35)
 
-                    # pie chart
+                    # vertical_bar chart
                     col1, col2 = st.columns(2)
                     selectstate_year_wise_total_registered_user = map_user.selectstate_year_wise_total_registered_user(state_option)
                     selectstate_year_wise_total_app_opens = map_user.selectstate_year_wise_total_app_opens(state_option)
                     with col1:
-                        plotly.pie_chart(df=selectstate_year_wise_total_registered_user, x='Year', y='Registered Users',
-                                        title='Year wise Registered Users')
+                        plotly.vertical_bar_chart(df=selectstate_year_wise_total_registered_user,x='Year',y='Registered Users', 
+                                                    text='Register', color='#5D9A96', title='Year wise Registered Users', title_x=0.30)
                     with col2:
-                        plotly.pie_chart(df=selectstate_year_wise_total_app_opens, x='Year', y='App Opens',
-                                        title='Year wise App Opens')
-                        
-                    # vertical_bar chart
+                        plotly.vertical_bar_chart(df=selectstate_year_wise_total_app_opens,x='Year',y='App Opens', 
+                                                    text='App', color='#5cb85c', title='Year wise App Opens', title_x=0.35)
+
+                    # pie chart
                     col1, col2 = st.columns(2)
                     selectstate_quater_wise_total_registered_user = map_user.selectstate_quater_wise_total_registered_user(state_option)
                     selectstate_quater_wise_total_app_opens = map_user.selectstate_quater_wise_total_app_opens(state_option)
                     with col1:
-                        plotly.vertical_bar_chart(df=selectstate_quater_wise_total_registered_user,x='Quater',y='Registered Users', 
-                                                    text='Register', color='#5D9A96', title='Quater wise Registered Users', title_x=0.30)
+                        plotly.pie_chart(df=selectstate_quater_wise_total_registered_user, x='Quater', y='Registered Users',
+                                        title='Quater wise Registered Users')
                     with col2:
-                        plotly.vertical_bar_chart(df=selectstate_quater_wise_total_app_opens,x='Quater',y='App Opens', 
-                                                    text='App', color='#5cb85c', title='Quater wise App Opens', title_x=0.35)
+                        plotly.pie_chart(df=selectstate_quater_wise_total_app_opens, x='Quater', y='App Opens',
+                                        title='Quater wise App Opens')
+                        
+                    
                     
                     # multi line chart
                     col1, col2 = st.columns(2)
@@ -5244,8 +5264,7 @@ def data_analysis():
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
                     st.write('')
-                    year_option = st.selectbox(
-                        'Year:   ', ['2022', '2021', '2020', '2019', '2018'])
+                    year_option = st.selectbox('Year:   ', year_list())
                     advanced_filters = st.checkbox('Advanced Filters   ')
                     st.write('')
                 if advanced_filters:
@@ -5326,7 +5345,7 @@ def data_analysis():
                                                 text='Transaction', textposition=['bottom left','top right','top right','top right','top right'], 
                                                 color='#716cf8', title='Type wise Transaction Amount', title_x=0.35)
 
-                    elif year_option != 'Select One' and quater_option != 'Select One':
+                    elif state_option != 'Select One' and quater_option != 'Select One':
                         # line chart
                         col1, col2 = st.columns(2)
                         selectstate_selectyear_selectquater_type_wise_total_transaction_count = aggregated_transaction.selectstate_selectyear_selectquater_type_wise_total_transaction_count(
@@ -5335,24 +5354,21 @@ def data_analysis():
                                                                                                             state_option, year_option, quater_option)
                         with col1:
                             plotly.line_chart(df=selectstate_selectyear_selectquater_type_wise_total_transaction_count,y='Transaction Type',x='Transaction Count', 
-                                                text='Transaction', textposition=['bottom left','bottom center','top center','top right','top right'], 
+                                                text='Transaction', textposition=['bottom left','bottom left','top right','top right','top right'], 
                                                 color='#ba6e77', title='Type wise Transaction Count', title_x=0.35)
                         with col2:
                             plotly.line_chart(df=selectstate_selectyear_selectquater_type_wise_total_transaction_amount,y='Transaction Type',x='Transaction Amount', 
-                                                text='Transaction', textposition=['bottom left','bottom center','top right','top right','top right'], 
+                                                text='Transaction', textposition=['bottom left','bottom left','top right','top right','top right'], 
                                                 color='#716cf8', title='Type wise Transaction Amount', title_x=0.35)
 
                 else:
-                    option = st.radio(
-                        '', ['Transaction Count', 'Transaction Amount'], horizontal=True)
+                    option = st.radio('', ['Transaction Count', 'Transaction Amount'], horizontal=True)
                     if option == 'Transaction Count':
-                        selectyear_state_wise_total_transaction_count = aggregated_transaction.selectyear_state_wise_total_transaction_count(
-                            year_option)
+                        selectyear_state_wise_total_transaction_count = aggregated_transaction.selectyear_state_wise_total_transaction_count(year_option)
                         plotly.geo_map(selectyear_state_wise_total_transaction_count,
                                        'State', 'Transaction Count', 'State wise Transaction Count')
                     elif option == 'Transaction Amount':
-                        selectyear_state_wise_total_transaction_amount = aggregated_transaction.selectyear_state_wise_total_transaction_amount(
-                            year_option)
+                        selectyear_state_wise_total_transaction_amount = aggregated_transaction.selectyear_state_wise_total_transaction_amount(year_option)
                         plotly.geo_map(selectyear_state_wise_total_transaction_amount,
                                        'State', 'Transaction Amount', 'State wise Transaction Amount')
 
@@ -5424,8 +5440,7 @@ def data_analysis():
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
                     st.write('')
-                    year_option = st.selectbox(
-                        'Year:    ', ['2022', '2021', '2020', '2019', '2018'])
+                    year_option = st.selectbox('Year:    ', year_list())
                     advanced_filters = st.checkbox('Advanced Filters    ')
                     st.write('')
                 if advanced_filters:
@@ -5499,8 +5514,7 @@ def data_analysis():
                         plotly.vertical_bar_chart(df=selectyear_selectquater_brand_wise_total_user_count, x='User Brand', y='User Count', 
                                                     text='User', color='#5D9A96', title='Brand wise User Count', title_x=0.40)
 
-
-                    elif year_option != 'Select One' and quater_option != 'Select One':
+                    elif state_option != 'Select One' and quater_option != 'Select One':
                         # vertical_bar chart
                         selectstate_selectyear_selectquater_brand_wise_total_user_count = aggregated_user.selectstate_selectyear_selectquater_brand_wise_total_user_count(
                                                                                                             state_option, year_option, quater_option)
@@ -5600,8 +5614,9 @@ def data_analysis():
                         list_state.extend(state_list())
                         state_option = st.selectbox('State:     ', list_state)
                     with col2:
-                        year_option = st.selectbox(
-                            'Year:     ', ['Select One', '2022', '2021', '2020', '2019', '2018'])
+                        list_year = ['Select One']
+                        list_year.extend(year_list())
+                        year_option = st.selectbox('Year:     ', list_year)
                     st.write('')
 
                 if quater_option and advanced_filters:
@@ -5779,8 +5794,9 @@ def data_analysis():
                         list_state.extend(state_list())
                         state_option = st.selectbox('State:      ', list_state)
                     with col2:
-                        year_option = st.selectbox(
-                            'Year:      ', ['Select One', '2022', '2021', '2020', '2019', '2018'])
+                        list_year = ['Select One']
+                        list_year.extend(year_list())
+                        year_option = st.selectbox('Year:      ', list_year)
                     st.write('')
 
                 if quater_option and advanced_filters:
@@ -5904,8 +5920,9 @@ def data_analysis():
                 with col1:
                     state_option = st.selectbox('State:       ', state_list())
                 with col2:
-                    year_option = st.selectbox(
-                        'Year:       ', ['Over All', '2022', '2021', '2020', '2019', '2018'])
+                    list_year = ['Over All']
+                    list_year.extend(year_list())
+                    year_option = st.selectbox('Year:       ', list_year)
                 with col3:
                     quater_option = st.selectbox(
                         'Quater:       ', ['Over All', 'Q1', 'Q2', 'Q3', 'Q4'])
@@ -5938,8 +5955,9 @@ def data_analysis():
                 with col1:
                     state_option = st.selectbox('State:        ', state_list())
                 with col2:
-                    year_option = st.selectbox(
-                        'Year:        ', ['Over All', '2022', '2021', '2020', '2019', '2018'])
+                    list_year = ['Over All']
+                    list_year.extend(year_list())
+                    year_option = st.selectbox('Year:        ', list_year)
                 with col3:
                     quater_option = st.selectbox(
                         'Quater:        ', ['Over All', 'Q1', 'Q2', 'Q3', 'Q4'])
@@ -6017,8 +6035,9 @@ def data_analysis():
                     list_state.extend(state_list())
                     state_option = st.selectbox('State:        ', list_state)
                 with col2:
-                    year_option = st.selectbox(
-                        'Year:        ', ['Select One', '2022', '2021', '2020', '2019', '2018'])
+                    list_year = ['Select One']
+                    list_year.extend(year_list())
+                    year_option = st.selectbox('Year:         ', list_year)
                 with col3:
                     quater_option = st.selectbox(
                         'Quater:        ', ['Select One', 'Q1', 'Q2', 'Q3', 'Q4'])
@@ -6241,7 +6260,9 @@ def data_analysis():
                     list_state.extend(state_list())
                     state_option = st.selectbox('State:         ', list_state)
                 with col2:
-                    year_option = st.selectbox('Year:         ', ['Select One', '2022', '2021', '2020', '2019', '2018'])
+                    list_year = ['Select One']
+                    list_year.extend(year_list())
+                    year_option = st.selectbox('Year:          ', list_year)
                 with col3:
                     quater_option = st.selectbox('Quater:         ', ['Select One', 'Q1', 'Q2', 'Q3', 'Q4'])
                     st.write('')
@@ -6338,13 +6359,12 @@ def data_analysis():
                 plotly.marker_multi_line_chart(df=selectbrand_year_quater_wise_total_user_count, y='User Count',x='Quater', colorcolumn='Year',
                                                 title='Year - Quater wise User Count', title_x=0.35, text='User', textposition='top center')
 
-        elif analysis == 'Top 10 Insights':
+        elif analysis == 'Top 10':
             transactions, users = st.tabs(['Transactions', 'Users'])
             with transactions:
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    year_option = st.selectbox(
-                        'Year:         ', ['2022', '2021', '2020', '2019', '2018'])
+                    year_option = st.selectbox('Year:           ', year_list())
                 with col2:
                     quater_option = st.selectbox(
                         'Quater:         ', ['Q1', 'Q2', 'Q3', 'Q4'])
@@ -6403,8 +6423,7 @@ def data_analysis():
             with users:
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    year_option = st.selectbox(
-                        'Year:           ', ['2022', '2021', '2020', '2019', '2018'])
+                    year_option = st.selectbox('Year:            ', year_list())
                 with col2:
                     quater_option = st.selectbox('Quater:           ', [
                                                  'Q1', 'Q2', 'Q3', 'Q4'])
@@ -6479,21 +6498,101 @@ if option:
         st.balloons()
 
     elif option == 'Data Overview':
-        data_overview()
+        def data():
+            try:
+                path = "phonepe_pulse_git/data/aggregated/transaction/country/india/state/"
+                agg_state_list = os.listdir(path)
+
+                data = {'State': [], 'Year': [], 'Quater': [], 'Transaction_type': [],
+                        'Transaction_count': [], 'Transaction_amount': []}
+
+                for i in agg_state_list:
+                    path_i = path + i + '/'
+                    agg_year_list = os.listdir(path_i)
+
+                    for j in agg_year_list:
+                        path_j = path_i + j + '/'
+                        agg_year_json = os.listdir(path_j)
+
+                        for k in agg_year_json:
+                            path_k = path_j + k
+                            f = open(path_k, 'r')
+                            d = json.load(f)
+
+                            for z in d['data']['transactionData']:
+                                name = z['name']
+                                count = z['paymentInstruments'][0]['count']
+                                amount = z['paymentInstruments'][0]['amount']
+
+                                data['State'].append(i)
+                                data['Year'].append(j)
+                                data['Quater'].append('Q'+str(k[0]))
+                                data['Transaction_type'].append(name)
+                                data['Transaction_count'].append(count)
+                                data['Transaction_amount'].append(amount)
+
+                return data
+            except:
+                st.warning('No PhonePe Pulse data found in your local directory')
+                return 0
+
+        c1 = data()
+        c2 = data_extraction.aggregated_transaction()
+        if c1==c2:
+            data_overview()
 
     elif option == 'Migrating Data to SQL Database':
-        try:
+        def data():
+            try:
+                path = "phonepe_pulse_git/data/aggregated/transaction/country/india/state/"
+                agg_state_list = os.listdir(path)
+
+                data = {'State': [], 'Year': [], 'Quater': [], 'Transaction_type': [],
+                        'Transaction_count': [], 'Transaction_amount': []}
+
+                for i in agg_state_list:
+                    path_i = path + i + '/'
+                    agg_year_list = os.listdir(path_i)
+
+                    for j in agg_year_list:
+                        path_j = path_i + j + '/'
+                        agg_year_json = os.listdir(path_j)
+
+                        for k in agg_year_json:
+                            path_k = path_j + k
+                            f = open(path_k, 'r')
+                            d = json.load(f)
+
+                            for z in d['data']['transactionData']:
+                                name = z['name']
+                                count = z['paymentInstruments'][0]['count']
+                                amount = z['paymentInstruments'][0]['amount']
+
+                                data['State'].append(i)
+                                data['Year'].append(j)
+                                data['Quater'].append('Q'+str(k[0]))
+                                data['Transaction_type'].append(name)
+                                data['Transaction_count'].append(count)
+                                data['Transaction_amount'].append(amount)
+
+                return data
+            except:
+                st.warning('No PhonePe Pulse data found in your local directory')
+                return 0
+
+        c1 = data()
+        c2 = data_extraction.aggregated_transaction()
+        if c1==c2:
             data_load.sql_table_creation()
             data_load.data_migration()
             st.success('Data successfully Migrated to the SQL Database')
-            st.balloons()
-        except:
-            st.warning('No PhonePe Pulse data found in your local directory')
-    
+            st.balloons()         
+
     elif option == 'Data Insights and Exploration':
-        try:
+        s = state_list()
+        if len(s)>0:
             data_analysis()
-        except:
+        else:
             st.warning('The SQL database is currently empty')
 
     elif option == 'Exit':
