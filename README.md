@@ -63,7 +63,7 @@ To use this project, follow these steps:
 
 **Top Performers Highlight:** Effortlessly discern the top 10 states, districts, and pincodes through user-friendly visualizations. Engage with ease using our intuitive Streamlit dashboard, designed for seamless exploration. Navigate through insightful charts and graphs to glean actionable insights, empowering you to make informed decisions. Simplify your data-driven strategy by focusing on key performance indicators, ensuring a comprehensive understanding of top performers.
 
-**Data-Driven Decision Making:** Elevate your decision-making prowess by leveraging insights from PhonePe Pulse data—uncover valuable trends, patterns, and statistics. Navigate confidently through a sea of information, ensuring each decision is fortified with robust, data-driven analysis. Empower your strategies with actionable intelligence, transforming raw data into a powerful tool for informed and impactful choices. Make every decision count with the precision and confidence derived from a data-rich foundation.
+**Data-Driven Decision Making:** Elevate your decision-making prowess by leveraging insights from PhonePe Pulse data uncover valuable trends, patterns, and statistics. Navigate confidently through a sea of information, ensuring each decision is fortified with robust, data-driven analysis. Empower your strategies with actionable intelligence, transforming raw data into a powerful tool for informed and impactful choices. Make every decision count with the precision and confidence derived from a data-rich foundation.
 
 Project Demo Video: [PhonePe Pulse Data Visualization and Exploration](https://youtu.be/4t_AWUr_RIE?si=L_YEy_GMom2KQ_3k)
 
