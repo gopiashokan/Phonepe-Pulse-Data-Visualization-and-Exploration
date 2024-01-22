@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Developed a Streamlit application for analyzing transactions and user data from the PhonePe Pulse dataset cloned from the GitHub repository. Explored data insights on states, years, quarters, districts, transaction types, and user brands through EDA. Visualized trends and patterns using plots and charts to optimize decision-making in the Fintech industry.
+Developed a Streamlit application for analyzing transactions and user data from the Pulse dataset cloned from the PhonePe Pulse GitHub repository. Explored data insights on states, years, quarters, districts, transaction types, and user brands through EDA. Visualized trends and patterns using plots and charts to optimize decision-making in the Fintech industry.
 
 ## Table of Contents
 
