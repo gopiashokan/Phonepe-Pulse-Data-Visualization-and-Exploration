@@ -16,11 +16,10 @@ Developed a Streamlit application for analyzing transactions and user data from 
 
 ## Key Technologies and Skills
 - Python
-- Git
-- Pandas
 - PostgreSQL
-- Streamlit
+- Pandas
 - Plotly
+- Streamlit
 
 ## Installation
 
@@ -31,9 +30,9 @@ git - [https://git-scm.com/downloads](https://git-scm.com/downloads)
 ```python
 pip install pandas
 pip install psycopg2
+pip install plotly
 pip install requests
 pip install streamlit
-pip install plotly
 ```
 
 ## Usage
